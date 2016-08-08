@@ -1,0 +1,32 @@
+{
+    "name": "kaliber5/sylius-security-bundle",
+    "description": "adds extra security to sylius resource bundle",
+    "type": "symfony-bundle",
+    "authors": [
+        {
+            "name": "Andreas Schacht",
+            "email": "schacht@kaliber5.de"
+        },
+        {
+            "name": "Simon Ihmig",
+            "email": "ihmig@kaliber5.de"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://composer.kaliber5.de"
+        }
+    ],
+    "require": {
+        "symfony/symfony": "^2.7.0",
+        "sylius/resource-bundle": "^0.17",
+        "kaliber5/logger-bundle": "^1.0.0"
+    },
+    "require-dev": {
+        "phpspec/phpspec": "^2.5"
+    },
+    "autoload": {
+        "psr-4": { "Kaliber5\\SerializerBundle\\": "" }
+    }
+}

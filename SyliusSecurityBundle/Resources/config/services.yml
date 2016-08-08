@@ -1,0 +1,32 @@
+parameters:
+  k5.voter.granted.class: Kaliber5\SyliusSecurityBundle\Voter\ActionGrantedVoter
+
+services:
+  sylius.resource_controller.authorization_checker:
+    class: Kaliber5\SyliusSecurityBundle\Controller\AuthorizationChecker
+    arguments:
+      - "@security.authorization_checker"
+    tags:
+      - { name: k5.logger.logging }
+
+  sylius.resource_controller.resources_collection_provider:
+    class: Kaliber5\SyliusSecurityBundle\Controller\ResourcesCollectionProvider
+    arguments:
+      - "@sylius.resource_controller.pagerfanta_representation_factory"
+      - "@kaliber5.sylius_security.manipulator"
+      - "@security.authorization_checker"
+    tags:
+      - { name: k5.logger.logging }
+
+  sylius.resource_controller.single_resource_provider:
+    class: Kaliber5\SyliusSecurityBundle\Controller\SingleResourceProvider
+    arguments:
+      - "@kaliber5.sylius_security.manipulator"
+      - "@security.authorization_checker"
+    tags:
+      - { name: k5.logger.logging }
+
+  kaliber5.sylius_security.manipulator:
+    class: Kaliber5\SyliusSecurityBundle\Manipulator\ResourceProviderManipulatorContainer
+    tags:
+          - { name: k5.logger.logging }
