@@ -12,6 +12,7 @@ services:
   sylius.resource_controller.resources_collection_provider:
     class: Kaliber5\SyliusSecurityBundle\Controller\ResourcesCollectionProvider
     arguments:
+      - "@sylius.resource_controller.resources_resolver"
       - "@sylius.resource_controller.pagerfanta_representation_factory"
       - "@kaliber5.sylius_security.manipulator"
       - "@security.authorization_checker"

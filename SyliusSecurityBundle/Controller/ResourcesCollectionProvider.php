@@ -20,8 +20,8 @@ use Kaliber5\SyliusSecurityBundle\Manipulator\ResourceProviderManipulatorInterfa
 use Pagerfanta\Pagerfanta;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\ResourcesCollectionProviderInterface;
+use Sylius\Bundle\ResourceBundle\Controller\ResourcesResolverInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
-use Sylius\Bundle\ResourceBundle\Controller\ResourcesCollectionProvider as BaseResourcesCollectionProvider;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
@@ -32,10 +32,15 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
  *
  * @package Kaliber5\SyliusSecurityBundle\Controller
  */
-class ResourcesCollectionProvider extends BaseResourcesCollectionProvider implements ResourcesCollectionProviderInterface
+class ResourcesCollectionProvider implements ResourcesCollectionProviderInterface
 {
     use LoggingTrait;
     use PermissionTrait;
+
+    /**
+     * @var ResourcesResolverInterface
+     */
+    protected $resourcesResolver;
 
     /**
      * @var ResourceProviderManipulatorInterface
@@ -53,16 +58,17 @@ class ResourcesCollectionProvider extends BaseResourcesCollectionProvider implem
     protected $authorizationChecker;
 
     /**
+     * @param ResourcesResolverInterface           $resourcesResolver
      * @param PagerfantaFactory                    $pagerfantaRepresentationFactory
      * @param ResourceProviderManipulatorInterface $manipulator
      * @param AuthorizationCheckerInterface        $authorizationChecker
      */
-    public function __construct(PagerfantaFactory $pagerfantaRepresentationFactory, ResourceProviderManipulatorInterface $manipulator, AuthorizationCheckerInterface $authorizationChecker)
+    public function __construct(ResourcesResolverInterface $resourcesResolver, PagerfantaFactory $pagerfantaRepresentationFactory, ResourceProviderManipulatorInterface $manipulator, AuthorizationCheckerInterface $authorizationChecker)
     {
-        parent::__construct($pagerfantaRepresentationFactory);
         $this->pagerfantaRepresentationFactory = $pagerfantaRepresentationFactory;
         $this->manipulator = $manipulator;
         $this->authorizationChecker = $authorizationChecker;
+        $this->resourcesResolver = $resourcesResolver;
     }
 
     /**
@@ -75,22 +81,24 @@ class ResourcesCollectionProvider extends BaseResourcesCollectionProvider implem
         $permission = $this->getPermission($requestConfiguration->getRequest());
 
         if (empty($requestConfiguration->getCriteria())) {
-            $resources = parent::get($requestConfiguration, $repository);
+            $resources = $this->resourcesResolver->getResources($requestConfiguration, $repository);
         } else {
             $resources = $this->getResources($requestConfiguration, $repository);
+        }
 
-            if ($resources instanceof Pagerfanta) {
-                $resources->getCurrentPageResults();
-                $request = $requestConfiguration->getRequest();
-                $resources->setMaxPerPage($requestConfiguration->getPaginationMaxPerPage());
-                $resources->setCurrentPage($request->query->get('page', 1));
+        if ($resources instanceof Pagerfanta) {
+            // @TODO is needed?
+            //$resources->getCurrentPageResults();
+            $request = $requestConfiguration->getRequest();
+            $resources->setMaxPerPage($requestConfiguration->getPaginationMaxPerPage());
+            $resources->setCurrentPage($request->query->get('page', 1));
 
-                if (!$requestConfiguration->isHtmlRequest()) {
-                    $route = new Route($request->attributes->get('_route'), array_merge($request->attributes->get('_route_params'), $request->query->all()));
-                    $resources = $this->pagerfantaRepresentationFactory->createRepresentation($resources, $route);
-                }
+            if (!$requestConfiguration->isHtmlRequest()) {
+                $route = new Route($request->attributes->get('_route'), array_merge($request->attributes->get('_route_params'), $request->query->all()));
+                $resources = $this->pagerfantaRepresentationFactory->createRepresentation($resources, $route);
             }
         }
+
         $this->checkResources($resources, $permission);
         return $resources;
     }

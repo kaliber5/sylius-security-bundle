@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Kaliber5\LoggerBundle\LoggingTrait\LoggingTrait;
 use Kaliber5\SyliusSecurityBundle\Manipulator\ResourceProviderManipulatorInterface;
-use Sylius\Bundle\ResourceBundle\Controller\SingleResourceProvider as BaseSingleResourceProvider;
+use Sylius\Bundle\ResourceBundle\Controller\SingleResourceProvider as SyliusSingleResourceProvider;
 use Sylius\Bundle\ResourceBundle\Controller\RequestConfiguration;
 use Sylius\Bundle\ResourceBundle\Controller\SingleResourceProviderInterface;
 use Sylius\Component\Resource\Repository\RepositoryInterface;
@@ -26,7 +26,7 @@ use Sylius\Component\Resource\Repository\RepositoryInterface;
  * This class extends the SyliusSingleResourceProvider by security checks
  * @package Kaliber5\SyliusSecurityBundle\Controller
  */
-class SingleResourceProvider extends BaseSingleResourceProvider implements SingleResourceProviderInterface
+class SingleResourceProvider implements SingleResourceProviderInterface
 {
     use PermissionTrait;
     use LoggingTrait;
@@ -60,7 +60,7 @@ class SingleResourceProvider extends BaseSingleResourceProvider implements Singl
         $this->logDebug('Call Manipulators for alias: '.$requestConfiguration->getMetadata()->getAlias());
         $this->manipulator->process($requestConfiguration, $repository);
         if (empty($requestConfiguration->getCriteria())) {
-            $resource = parent::get($requestConfiguration, $repository);
+            $resource = $this->syliusGet($requestConfiguration, $repository);
         } else {
             $criteria = $requestConfiguration->getCriteria();
 
@@ -80,5 +80,19 @@ class SingleResourceProvider extends BaseSingleResourceProvider implements Singl
             }
         }
         return $resource;
+    }
+
+    /**
+     * Cause The ResourceProvider is final now, we cant inherit from and use it directly
+     *
+     * @param RequestConfiguration $requestConfiguration
+     * @param RepositoryInterface  $repository
+     *
+     * @return null|object|\Sylius\Component\Resource\Model\ResourceInterface
+     */
+    protected function syliusGet(RequestConfiguration $requestConfiguration, RepositoryInterface $repository)
+    {
+        $resourceProvider = new SyliusSingleResourceProvider();
+        return $resourceProvider->get($requestConfiguration, $repository);
     }
 }
