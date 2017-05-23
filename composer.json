@@ -20,8 +20,8 @@
     ],
     "require": {
         "symfony/symfony": "^3.2",
-        "sylius/resource-bundle": "1.0.0-beta1@dev",
-        "sylius/resource": "1.0.0-beta1@dev",
+        "sylius/resource-bundle": "^1.0.0-beta1@dev",
+        "sylius/resource": "^1.0.0-beta1@dev",
         "kaliber5/logger-bundle": "^2.0.0"
     },
     "require-dev": {
