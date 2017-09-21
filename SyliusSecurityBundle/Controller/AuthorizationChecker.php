@@ -32,7 +32,7 @@ class AuthorizationChecker implements SyliusAuthorizationCheckerInterface
     /**
      * {@inheritdoc}
      */
-    public function isGranted(RequestConfiguration $requestConfiguration, $permission)
+    public function isGranted(RequestConfiguration $requestConfiguration, string $permission): bool
     {
         $this->logDebug('Check Permissions: '.$permission);
         return $this->authorizationChecker->isGranted($permission, $requestConfiguration);

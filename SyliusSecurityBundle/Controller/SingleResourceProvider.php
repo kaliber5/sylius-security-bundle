@@ -11,6 +11,7 @@
 
 namespace Kaliber5\SyliusSecurityBundle\Controller;
 
+use Sylius\Component\Resource\Model\ResourceInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Kaliber5\LoggerBundle\LoggingTrait\LoggingTrait;
@@ -54,7 +55,7 @@ class SingleResourceProvider implements SingleResourceProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function get(RequestConfiguration $requestConfiguration, RepositoryInterface $repository)
+    public function get(RequestConfiguration $requestConfiguration, RepositoryInterface $repository): ?ResourceInterface
     {
         $resource = null;
         $this->logDebug('Call Manipulators for alias: '.$requestConfiguration->getMetadata()->getAlias());
