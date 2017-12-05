@@ -43,7 +43,7 @@ abstract class AbstractApiVoter extends Voter implements VoterInterface
      */
     protected function supports($attribute, $subject)
     {
-        if ($this->supportsClass(get_class($subject))) {
+        if (is_object($subject) && $this->supportsClass(get_class($subject))) {
             return $this->supportsAttribute($attribute);
         } else {
             return false;
