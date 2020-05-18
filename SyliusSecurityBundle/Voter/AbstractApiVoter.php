@@ -6,7 +6,7 @@ use Sylius\Component\Resource\ResourceActions;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
-use Symfony\Component\Security\Core\Authorization\Voter\AbstractVoter;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @TODO this class was extending the AbstractVoter, removed in sf3.2, and should maybe refactored
